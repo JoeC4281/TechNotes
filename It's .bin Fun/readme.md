@@ -1,4 +1,4 @@
-TechNotes<br>
+# TechNotes<br>
 July 1990<br>
 Page 2<br>
 
@@ -10,7 +10,7 @@ Binary, or .bin, files are assembly language files that can be loaded into memor
 
 dBASE IV has two special commands that it uses when handling .bin files: LOAD and CALL. The LOAD command does exactly what you'd think it would do, it loads the .bin file into a special area of memory that is reserved for this purpose. The CALL command (and the CALL() funciton) runs the .bin file with the parameters you supply, (that is, memory variables, strings, and so on). These parameters are palced in a special place in memoury so that the .bin file cna find and act upon them. You can pass up to seven parameters.
 
-Interfacing dBASE IV with C
+## Interfacing dBASE IV with C
 
 Well you might have come to the conclusion that since we're loading assembly language routines into memory that we are forced into using that cryptic computer language known a Assembly with all it strange abbreviated commands. It's not quite that bad. Instead, you'll be shown how to write programs in the somewhat less crypitc language of C.
 
@@ -18,13 +18,13 @@ The C language has been around for about 20 years or so. It originally grew out 
 
 Those familiar with C might be saying "Well great, I'll just convert my 8000 line directory management C program into a .bin file!" Wrong! If you have this great program just run it from the dot prompt with the RUN command. Speaking from personal experience, most programs written in C probably can't be turned into a .bin file or, at worst, would take so much rewriting and dipping into assembler that it wouldn't be worth the effort. Most C functions supplied by the manufacturer of the compiler (printf for example) probably won't work in a .bin file. All I/O (input/output) operations for the most part must be handled in assembler.
 
-Reversing Character Strings
+## Reversing Character Strings
 
 Now let's do a more in-depth study on how we put together a C file. We'll look at two sample C files to get an idea of what is involved when constructing C code which will eventually be used inside of dBASE IV. The first file, StrRev.C, reverses the order of the letters in a string. The second one, StrDct.C, is used in instances when you want to place data in true dictionary order (more on "dictionary" order later). This example illustrates how multiple parameters to a .bin file can be passed by referencing an array that contains up to seven parameter addresses. For this example, we keep it simple and just use the first address parameter in the array. The hooks are in there to allow for expansion to more parameters.
 
 Let's start with StrRev.C (a function which reverses the characters in a string) because of its simplicity. We'll try to dissect this C program as much as possible so as to get a better understanding of all that is involved in making .bin files. Once you have a pretty good understanding of the various sections of a C file you can easily take this code and substitute in your own function in place of StrRev().
 
-Creating an .exe file
+## Creating an .exe file
 
 We start out by defining a constant known as EXE. Often times, it is easier to test your .bin file by first turning it into a small program that can be run from the DOS level; a file known as an executable file. In our StrRev example, we have constructed the file in such a way that if the constant EXE equals 1, we will then get our string parameter from the DOS prompt and print out its reverse using the C function Printf() (somewhat like the dBASE IV ? command). Since the size of your C program and other memory limitations can be weighing factors, there is no guarantee that your .exe program will run as a .bin file in dBASE IV, but at least you'll feel a little more confident of your coding.
 
@@ -34,11 +34,11 @@ The next few lines deal with what would be required to make our .exe file so it 
 
 Starting after the "#else" statement we see:
 
-void far main()
+<code>void far main()</code>
 
 This is declaring the main starting point of our program. It is very important that we declare main() in this way. The use of the keyword "far" causes the compiler to issue a far return (RETF) at the end of the program. This type of return is needed so that dBASE IV can jump back to what it was doing before it called your .bin file. Some C enthusiasts may have noticed that we are declaring our main function as "void", which usually means we don't want to return anything to the function/program that called the routine. In this case, we are not returning anything, just jumping back to dBASE.
 
-1010 Memory Lane
+## 1010 Memory Lane
 
 In the next three lines of code, we grab the string that dBASE IV has passed to the .bin file. dBASE sends a string to a .bin file by passing the address of where the string is stored in memory.
 
@@ -48,7 +48,7 @@ Registers are special memory locations within the computer's processor that prog
 
 Well, the hard part is over. All we need to do now is write the string function that we'll be using with our "p" variable. In this case we have the StrRev function but you could just as easily have a function which selectively alters upper or lower case, opens access to non-dBASE files or even encrypts it for security. Use your imagination. Our StrRev function reverses the order of the characters in a string by exchanging characters from the two ends until they meet each other in the middle. Any changes we make in our string function will be reflected in the string that is returned to dBASE IV. For this reason do not shorten or lengthen the string in any way because unpredictable results might follow.
 
-Sorting in Dictionary Order
+## Sorting in Dictionary Order
 
 We've looked at a rather simple example of a C program that we can use to create a .bin routine. Now lets look at a slightly more complicated example which has the ability to pass multiple parameters (a maximum of seven) to a .bin file. Our example will still only use one parameter though, just to keep it simple. The example in question is StrDct.C, a rudimentary translating function which we can use to place a data file in "dictionary order".
 
@@ -97,7 +97,6 @@ You should have seen "nhoJ" displayed if everything went ok. Repeat steps two th
 We can go ahead and create a UDF that will CALL StrRev with whatever string we gave it and then return the reversed string, but let's not. Instead, let's create a UDF called Strflp() which calls our StrFlp.bin file. StrFlp is a .bin file which "flips" ASCII characters. Those characters which have an ASCII value of 127 and below will have the value of 128 added (the letter 'A' which has a value of 65 would end up with a value of 193) and those above 127 will have 128 subtracted (160 becomes 32 or the space character).
 
 Enter the dBASE IV text editor by typing MODIFY COMMAND from the dot prompt. The code for our UDF is shown below.
-
 
 <code>FUNCTION StrFlp<br>
 * Strflp should have already been LOADed.<br>
@@ -193,81 +192,71 @@ ch = *p;<br>
 }</code><br>
 <br><br><br>
 <code>StrDct.C
-/* Program ...: Strdct.C
-Version ...: dBASE III Plus 1.0, 1.1
-dBASE IV 1.0, 1.1
-(Tested compilers/assemblers)
-Turbo C 1.5, 2.0 TASM 1.0
-Microsoft C 5.1 MASM 5.1
-*/
+/* Program ...: Strdct.C<br>
+Version ...: dBASE III Plus 1.0, 1.1<br>
+dBASE IV 1.0, 1.1<br>
+(Tested compilers/assemblers)<br>
+Turbo C 1.5, 2.0 TASM 1.0<br>
+Microsoft C 5.1 MASM 5.1<br>
+*/<br>
 
 
-#include "strlib.h"
+#include "strlib.h"<br>
 
-void far main() /* very important, make sure we get a far return */
-{
+void far main() /* very important, make sure we get a far return */<br>
+{<br>
 
-/* Tried to make this look familiar to 'C' programmers, Notice the
-use of argc and argv, I've set argc to have a value of 2 to
-simulate the routine being called from the DOS prompt */
+/* Tried to make this look familiar to 'C' programmers, Notice the<br>
+use of argc and argv, I've set argc to have a value of 2 to<br>
+simulate the routine being called from the DOS prompt */<br>
 
-int argc;
-unsigned char *argv[6];
+int argc;<br>
+unsigned char *argv[6];<br>
 
-Getregs(); /* Assign memory registers */
+Getregs(); /* Assign memory registers */<br>
 
-/* Translate the parameter passed by dBASE IV into something we
-can use, The argv[2] and argv[3] are placed here to show
-you how to read multiple parameters */
+/* Translate the parameter passed by dBASE IV into something we<br>
+can use, The argv[2] and argv[3] are placed here to show<br>
+you how to read multiple parameters */<br>
 
-argc = CX+1; /* Number of arguments */
-argv[1] = (unsigned char *)*((int *)MK_LONG(ES, DI + 0));
-argv[2] = (unsigned char *)*((int *)MK_LONG(ES, DI + 4));
-argv[3] = (unsigned char *)*((int *)MK_LONG(ES, DI + 8));
+argc = CX+1; /* Number of arguments */<br>
+argv[1] = (unsigned char *)*((int *)MK_LONG(ES, DI + 0));<br>
+argv[2] = (unsigned char *)*((int *)MK_LONG(ES, DI + 4));<br>
+argv[3] = (unsigned char *)*((int *)MK_LONG(ES, DI + 8));<br>
 
-if (argc>1) /* Do we have a string to use? */
-Strdct(argv[1]);
+if (argc>1) /* Do we have a string to use? */<br>
+Strdct(argv[1]);<br>
 
-}
+}<br>
 
-Strdct(str)
-unsigned char *str;
-{
+Strdct(str)<br>
+unsigned char *str;<br>
+{<br>
 
-/* Had to do it this way, couldn't do "trnslt[]={" */
+/* Had to do it this way, couldn't do "trnslt[]={" */<br>
 
-/* Read from AMENG.SO (Framework III). Table is case insensitive
-*/
-static unsigned char trnslt[256];
+/* Read from AMENG.SO (Framework III). Table is case insensitive<br>
+*/<br>
+static unsigned char trnslt[256];<br>
 
-trnslt[ 0]= 0; trnslt[ 1]= 1; trnslt[ 2]= 2; trnslt[3]= 3;
-trnslt[ 4]= 4; trnslt[ 5]= 5; trnslt[ 6]= 6; trnslt[7]= 7;
-trnslt[ 8]= 8; trnslt[ 9]= 9; trnslt[ 10]= 10; trnslt[11]= 11;
-trnslt[ 12]= 12; trnslt[ 13]= 13; trnslt[ 14]= 14; trnslt[15]= 15;
-trnslt[ 16]= 16; trnslt[ 17]= 17; trnslt[ 18]= 18; trnslt[19]= 19;
-trnslt[ 20]= 20; trnslt[ 21]= 21; trnslt[ 22]= 22; trnslt[23]= 23;
-trnslt[ 24]= 24; trnslt[ 25]= 25; trnslt[ 26]= 26; trnslt[27]= 27;
-trnslt[ 28]= 28; trnslt[ 29]= 29; trnslt[ 30]= 30; trnslt[31]= 31;
-trnslt[' ']=' '; trnslt['!']='!'; trnslt['\"']='\"';
-trnslt['#']='#';
-trnslt['$']='$'; trnslt['%']='%'; trnslt['&']='&';
-trnslt['\'']='\'';
-trnslt['(']='('; trnslt[')']=')'; trnslt['*']='*';
-trnslt['+']='+';
-trnslt[',']=','; trnslt['-']='-'; trnslt['.']='.';
-trnslt['/']='/';
-trnslt['0']='k'; trnslt['1']='l'; trnslt['2']='m';
-trnslt['3']='n';
-trnslt['4']='o'; trnslt['5']='p'; trnslt['6']='q';
-trnslt['7']='r';
-trnslt['8']='s'; trnslt['9']='t'; trnslt[':']='0';
-trnslt[';']='1';
-trnslt['<']='2'; trnslt['=']='3'; trnslt['>']='4';
-trnslt['?']='5';
-trnslt['@']='6'; trnslt['A']='7'; trnslt['B']='>';
-trnslt['C']='?';
-trnslt['D']='A'; trnslt['E']='B'; trnslt['F']='G';
-trnslt['G']='H';
+trnslt[ 0]= 0; trnslt[ 1]= 1; trnslt[ 2]= 2; trnslt[3]= 3;<br>
+trnslt[ 4]= 4; trnslt[ 5]= 5; trnslt[ 6]= 6; trnslt[7]= 7;<br>
+trnslt[ 8]= 8; trnslt[ 9]= 9; trnslt[ 10]= 10; trnslt[11]= 11;<br>
+trnslt[ 12]= 12; trnslt[ 13]= 13; trnslt[ 14]= 14; trnslt[15]= 15;<br>
+trnslt[ 16]= 16; trnslt[ 17]= 17; trnslt[ 18]= 18; trnslt[19]= 19;<br>
+trnslt[ 20]= 20; trnslt[ 21]= 21; trnslt[ 22]= 22; trnslt[23]= 23;<br>
+trnslt[ 24]= 24; trnslt[ 25]= 25; trnslt[ 26]= 26; trnslt[27]= 27;<br>
+trnslt[ 28]= 28; trnslt[ 29]= 29; trnslt[ 30]= 30; trnslt[31]= 31;<br>
+trnslt[' ']=' '; trnslt['!']='!'; trnslt['\"']='\"';trnslt['#']='#';<br>
+trnslt['$']='$'; trnslt['%']='%'; trnslt['&']='&';trnslt['\'']='\'';<br>
+trnslt['(']='('; trnslt[')']=')'; trnslt['*']='*';trnslt['+']='+';<br>
+trnslt[',']=','; trnslt['-']='-'; trnslt['.']='.';trnslt['/']='/';<br>
+trnslt['0']='k'; trnslt['1']='l'; trnslt['2']='m';trnslt['3']='n';<br>
+trnslt['4']='o'; trnslt['5']='p'; trnslt['6']='q';trnslt['7']='r';<br>
+trnslt['8']='s'; trnslt['9']='t'; trnslt[':']='0';trnslt[';']='1';<br>
+trnslt['<']='2'; trnslt['=']='3'; trnslt['>']='4';trnslt['?']='5';<br>
+trnslt['@']='6'; trnslt['A']='7'; trnslt['B']='>';trnslt['C']='?';<br>
+trnslt['D']='A'; trnslt['E']='B'; trnslt['F']='G';trnslt['G']='H';<br>
 trnslt['H']='I'; trnslt['I']='J'; trnslt['J']='O';
 trnslt['K']='P';
 trnslt['L']='Q'; trnslt['M']='R'; trnslt['N']='S';

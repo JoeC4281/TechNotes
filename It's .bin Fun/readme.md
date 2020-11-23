@@ -86,35 +86,32 @@ The filename reference would be either StrDct, StrRev, or StrFlp and you should 
 Now the real fun begins, we get to try out our .bin files in dBASE. We'll look at three different ways that we can use our .bin files with dBASE. All three ways can be mixed and matched with other .bin files.
 
 Let's first use our simplest .bin file, StrRev, since it is fairly easy to tell if a string has been reversed or not. From the dBASE IV dot prompt, type
-
-<code>LOAD StrRev && loads StrRev into memory<br>
-
-x="John" && test string<br>
-
-CALL StrRev WITH x && call Strrev<br>
-
-? x && what is the value now?</code>
-
+```
+LOAD StrRev && loads StrRev into memory
+x="John" && test string
+CALL StrRev WITH x && call Strrev
+? x && what is the value now?
+```
 You should have seen "nhoJ" displayed if everything went ok. Repeat steps two through four with different values to make sure our STRing REVersal is working.
 
 We can go ahead and create a UDF that will CALL StrRev with whatever string we gave it and then return the reversed string, but let's not. Instead, let's create a UDF called Strflp() which calls our StrFlp.bin file. StrFlp is a .bin file which "flips" ASCII characters. Those characters which have an ASCII value of 127 and below will have the value of 128 added (the letter 'A' which has a value of 65 would end up with a value of 193) and those above 127 will have 128 subtracted (160 becomes 32 or the space character).
 
 Enter the dBASE IV text editor by typing MODIFY COMMAND from the dot prompt. The code for our UDF is shown below.
-
-<code>FUNCTION StrFlp<br>
-* Strflp should have already been LOADed.<br>
-PARAMETER str<br>
-temp = str<br>
-CALL Strflp WITH temp<br>
-RETURN temp</code>
-
+```
+FUNCTION StrFlp
+* Strflp should have already been LOADed.
+PARAMETER str
+temp = str
+CALL Strflp WITH temp
+RETURN temp
+```
 After compiling this function, from the dot prompt, type:
 
-<code>? StrFlp("flip")</code>
+`? StrFlp("flip")`
 
 The result should look something like mq . Remember that StrFlp flips the value of the characters in a string so that characters which use to come at the start of the ASCII table now come at the end and vice-versa. If we do something like:
 
-<code>? StrFlp("mq")</code>
+`? StrFlp("mq")`
 
 we get "flip" back again since now the characters at the end of the ASCII table are transposed into characters at the beginning.
 
@@ -124,76 +121,78 @@ could not consistently deal with data in the BSS and would return bad values int
 The program is available on the Ashton-Tate BBS if you wish to download it.
 
 Now for our final example involving StrDct and putting database files in dictionary order. One of the advantages of .bin files is that they have the capability of being used for indexing via the CALL() function (as opposed to CALL command) in dBASE IV. If we have a database file that we decide we want in dictionary order, or StrRev order, or StrFlp order, all we need to do is the following:
-
-<code>USE Datafile<br>
-LOAD Strdct<br>
-INDEX ON CALL("Strdct",fieldname + "") TO Indexfile</code>
-
+```
+USE Datafile
+LOAD Strdct
+INDEX ON CALL("Strdct",fieldname + "") TO Indexfile
+```
 dBASE IV will then call StrDct for each record so that it can place our data in dictionary order. It is important to remember that whenever we use this datafile and index in the future to LOAD StrDct first. This indexing feature works well with StrFlp also. Suppose you wanted to put your file in order by last name plus first name but the first names needed to be in descending order, you could try this:
-
-<code>LOAD StrFlp<br>
-USE Namefile<br>
-INDEX ON lastname+CALL("StrFlp",firstname+"") TO Lfname</code>
-
+```
+LOAD StrFlp
+USE Namefile
+INDEX ON lastname+CALL("StrFlp",firstname+"") TO Lfname
+```
 This puts the last names in ascending order but the first names in descending order. You might be wondering why we need to add the + "" to the firstname field. This prevents dBASE IV from permanently changing the contents of the firstname field to whatever StrFlp would return.
 
 Well that about wraps up our journey into the world of C and dBASE .bin files. I hope you've seen that .bin files are really not that complicated once you understand a few of the guidelines and principles involved in their creation. .bin files provide for useful and powerful extensions to the dBASE language that in turn allow programmers to develop and code more extensive and powerful programs.
 
-<code>StrRev.C<br>
-/* Program ...: Strrev.C<br>
-Author ....: Erik A McBeth<br>
-Version ...: dBASE III Plus 1.0, 1.1<br>
-dBASE IV 1.0, 1.1<br>
-(Tested compilers/assemblers)<br>
-Turbo C 1.5, 2.0 TASM 1.0<br>
-Microsoft C 5.1 MASM 5.1<br>
-*/<br>
+```StrRev.C
+/* Program ...: Strrev.C
+Author ....: Erik A McBeth
+Version ...: dBASE III Plus 1.0, 1.1
+            dBASE IV 1.0, 1.1
+            (Tested compilers/assemblers)
+            Turbo C 1.5, 2.0 TASM 1.0
+            Microsoft C 5.1 MASM 5.1
+*
 
-#define EXE 0 /* Set to 1 if we want to create an exe,<br>
-If we have an exe then run from DOS like this<br>
-STRREV string and you'll see your string reversed */<br>
-<br>
-#include "strlib.h" /* Various definitions */<br>
-<br>
-#if EXE<br>
-#include "stdio.h"<br>
-<br>
-main(argc,argv)<br>
-int argc;<br>
-char *argv[];<br>
-{<br>
-unsigned char *p;<br>
-p = (unsigned char *)argv[1];<br>
-<br>
-#else /* Creating BIN file */<br>
-<br>
-void far main() /* Need a FAR return */<br>
-{<br>
-unsigned char *p;<br>
-Getregs(); /* Get our memory registers */<br>
-p = (unsigned char *)MK_LONG(DS,BX); /* Get our string */<br>
-#endif /* If EXE */<br>
-if (p)<br>
-Strrev(p); /* Same operation if we do a bin or an exe */<br>
-#if EXE<br>
-printf("%s\n",p);<br>
-#endif<br>
-}<br>
-Strrev(str)<br>
-unsigned char *str;<br>
-{<br>
-unsigned char *p=str,ch;<br>
-/* Go to the end of the string and stop */<br>
-while(*++p);<br>
-/* Now swap the letters until we come to the middle of the string<br>
-*/<br>
-for(--p;p>str;p--,str++) {<br>
-ch = *p;<br>
-*p = *str;<br>
-*str = ch;<br>
-}<br>
-}</code><br>
-<br><br><br>
+#define EXE 0 /* Set to 1 if we want to create an exe,
+If we have an exe then run from DOS like this
+STRREV string and you'll see your string reversed */
+
+#include "strlib.h" /* Various definitions */
+
+#if EXE
+#include "stdio.h"
+
+main(argc,argv)
+int argc;
+char *argv[];
+{
+unsigned char *p;
+p = (unsigned char *)argv[1];
+
+#else /* Creating BIN file */
+
+void far main() /* Need a FAR return */
+{
+    unsigned char *p;
+    Getregs(); /* Get our memory registers */
+    p = (unsigned char *)MK_LONG(DS,BX); /* Get our string */
+#endif /* If EXE */
+
+if (p)
+Strrev(p); /* Same operation if we do a bin or an exe */
+#if EXE
+    printf("%s\n",p);
+#endif
+}
+
+Strrev(str)
+unsigned char *str;
+{
+    unsigned char *p=str,ch;
+    /* Go to the end of the string and stop */
+    while(*++p);
+    /* Now swap the letters until we come to the middle of the string
+    */
+    for(--p;p>str;p--,str++) {
+    ch = *p;
+    *p = *str;
+    *str = ch;
+}
+}
+```
 <code>StrDct.C
 /* Program ...: Strdct.C<br>
 Version ...: dBASE III Plus 1.0, 1.1<br>

@@ -88,8 +88,11 @@ Now the real fun begins, we get to try out our .bin files in dBASE. We'll look a
 Let's first use our simplest .bin file, StrRev, since it is fairly easy to tell if a string has been reversed or not. From the dBASE IV dot prompt, type
 
 <code>LOAD StrRev && loads StrRev into memory<br>
+
 x="John" && test string<br>
+
 CALL StrRev WITH x && call Strrev<br>
+
 ? x && what is the value now?</code>
 
 You should have seen "nhoJ" displayed if everything went ok. Repeat steps two through four with different values to make sure our STRing REVersal is working.

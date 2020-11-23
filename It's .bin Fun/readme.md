@@ -1,6 +1,6 @@
-# TechNotes<br>
-July 1990<br>
-Page 2<br>
+# TechNotes
+July 1990
+Page 2
 
 Erik McBeth
 
@@ -193,72 +193,72 @@ unsigned char *str;
 }
 }
 ```
-<code>StrDct.C
-/* Program ...: Strdct.C<br>
-Version ...: dBASE III Plus 1.0, 1.1<br>
-dBASE IV 1.0, 1.1<br>
-(Tested compilers/assemblers)<br>
-Turbo C 1.5, 2.0 TASM 1.0<br>
-Microsoft C 5.1 MASM 5.1<br>
-*/<br>
+```StrDct.C
+/* Program ...: Strdct.C
+Version ...: dBASE III Plus 1.0, 1.1
+dBASE IV 1.0, 1.1
+(Tested compilers/assemblers)
+Turbo C 1.5, 2.0 TASM 1.0
+Microsoft C 5.1 MASM 5.1
+*/
 
 
-#include "strlib.h"<br>
+#include "strlib.h"
 
-void far main() /* very important, make sure we get a far return */<br>
-{<br>
+void far main() /* very important, make sure we get a far return */
+{
 
-/* Tried to make this look familiar to 'C' programmers, Notice the<br>
-use of argc and argv, I've set argc to have a value of 2 to<br>
-simulate the routine being called from the DOS prompt */<br>
+/* Tried to make this look familiar to 'C' programmers, Notice the
+use of argc and argv, I've set argc to have a value of 2 to
+simulate the routine being called from the DOS prompt */
 
-int argc;<br>
-unsigned char *argv[6];<br>
+int argc;
+unsigned char *argv[6];
 
-Getregs(); /* Assign memory registers */<br>
+Getregs(); /* Assign memory registers */
 
-/* Translate the parameter passed by dBASE IV into something we<br>
-can use, The argv[2] and argv[3] are placed here to show<br>
-you how to read multiple parameters */<br>
+/* Translate the parameter passed by dBASE IV into something we
+can use, The argv[2] and argv[3] are placed here to show
+you how to read multiple parameters */
 
-argc = CX+1; /* Number of arguments */<br>
-argv[1] = (unsigned char *)*((int *)MK_LONG(ES, DI + 0));<br>
-argv[2] = (unsigned char *)*((int *)MK_LONG(ES, DI + 4));<br>
-argv[3] = (unsigned char *)*((int *)MK_LONG(ES, DI + 8));<br>
+argc = CX+1; /* Number of arguments */
+argv[1] = (unsigned char *)*((int *)MK_LONG(ES, DI + 0));
+argv[2] = (unsigned char *)*((int *)MK_LONG(ES, DI + 4));
+argv[3] = (unsigned char *)*((int *)MK_LONG(ES, DI + 8));
 
-if (argc>1) /* Do we have a string to use? */<br>
-Strdct(argv[1]);<br>
+if (argc>1) /* Do we have a string to use? */
+Strdct(argv[1]);
 
-}<br>
+}
 
-Strdct(str)<br>
-unsigned char *str;<br>
-{<br>
+Strdct(str)
+unsigned char *str;
+{
 
-/* Had to do it this way, couldn't do "trnslt[]={" */<br>
+/* Had to do it this way, couldn't do "trnslt[]={" */
 
-/* Read from AMENG.SO (Framework III). Table is case insensitive<br>
-*/<br>
-static unsigned char trnslt[256];<br>
+/* Read from AMENG.SO (Framework III). Table is case insensitive
+*/
+static unsigned char trnslt[256];
 
-trnslt[ 0]= 0; trnslt[ 1]= 1; trnslt[ 2]= 2; trnslt[3]= 3;<br>
-trnslt[ 4]= 4; trnslt[ 5]= 5; trnslt[ 6]= 6; trnslt[7]= 7;<br>
-trnslt[ 8]= 8; trnslt[ 9]= 9; trnslt[ 10]= 10; trnslt[11]= 11;<br>
-trnslt[ 12]= 12; trnslt[ 13]= 13; trnslt[ 14]= 14; trnslt[15]= 15;<br>
-trnslt[ 16]= 16; trnslt[ 17]= 17; trnslt[ 18]= 18; trnslt[19]= 19;<br>
-trnslt[ 20]= 20; trnslt[ 21]= 21; trnslt[ 22]= 22; trnslt[23]= 23;<br>
-trnslt[ 24]= 24; trnslt[ 25]= 25; trnslt[ 26]= 26; trnslt[27]= 27;<br>
-trnslt[ 28]= 28; trnslt[ 29]= 29; trnslt[ 30]= 30; trnslt[31]= 31;<br>
-trnslt[' ']=' '; trnslt['!']='!'; trnslt['\"']='\"';trnslt['#']='#';<br>
-trnslt['$']='$'; trnslt['%']='%'; trnslt['&']='&';trnslt['\'']='\'';<br>
-trnslt['(']='('; trnslt[')']=')'; trnslt['*']='*';trnslt['+']='+';<br>
-trnslt[',']=','; trnslt['-']='-'; trnslt['.']='.';trnslt['/']='/';<br>
-trnslt['0']='k'; trnslt['1']='l'; trnslt['2']='m';trnslt['3']='n';<br>
-trnslt['4']='o'; trnslt['5']='p'; trnslt['6']='q';trnslt['7']='r';<br>
-trnslt['8']='s'; trnslt['9']='t'; trnslt[':']='0';trnslt[';']='1';<br>
-trnslt['<']='2'; trnslt['=']='3'; trnslt['>']='4';trnslt['?']='5';<br>
-trnslt['@']='6'; trnslt['A']='7'; trnslt['B']='>';trnslt['C']='?';<br>
-trnslt['D']='A'; trnslt['E']='B'; trnslt['F']='G';trnslt['G']='H';<br>
+trnslt[ 0]= 0; trnslt[ 1]= 1; trnslt[ 2]= 2; trnslt[3]= 3;
+trnslt[ 4]= 4; trnslt[ 5]= 5; trnslt[ 6]= 6; trnslt[7]= 7;
+trnslt[ 8]= 8; trnslt[ 9]= 9; trnslt[ 10]= 10; trnslt[11]= 11;
+trnslt[ 12]= 12; trnslt[ 13]= 13; trnslt[ 14]= 14; trnslt[15]= 15;
+trnslt[ 16]= 16; trnslt[ 17]= 17; trnslt[ 18]= 18; trnslt[19]= 19;
+trnslt[ 20]= 20; trnslt[ 21]= 21; trnslt[ 22]= 22; trnslt[23]= 23;
+trnslt[ 24]= 24; trnslt[ 25]= 25; trnslt[ 26]= 26; trnslt[27]= 27;
+trnslt[ 28]= 28; trnslt[ 29]= 29; trnslt[ 30]= 30; trnslt[31]= 31;
+trnslt[' ']=' '; trnslt['!']='!'; trnslt['\"']='\"';trnslt['#']='#';
+trnslt['$']='$'; trnslt['%']='%'; trnslt['&']='&';trnslt['\'']='\'';
+trnslt['(']='('; trnslt[')']=')'; trnslt['*']='*';trnslt['+']='+';
+trnslt[',']=','; trnslt['-']='-'; trnslt['.']='.';trnslt['/']='/';
+trnslt['0']='k'; trnslt['1']='l'; trnslt['2']='m';trnslt['3']='n';
+trnslt['4']='o'; trnslt['5']='p'; trnslt['6']='q';trnslt['7']='r';
+trnslt['8']='s'; trnslt['9']='t'; trnslt[':']='0';trnslt[';']='1';
+trnslt['<']='2'; trnslt['=']='3'; trnslt['>']='4';trnslt['?']='5';
+trnslt['@']='6'; trnslt['A']='7'; trnslt['B']='>';trnslt['C']='?';
+trnslt['D']='A'; trnslt['E']='B'; trnslt['F']='G';trnslt['G']='H';
 trnslt['H']='I'; trnslt['I']='J'; trnslt['J']='O';
 trnslt['K']='P';
 trnslt['L']='Q'; trnslt['M']='R'; trnslt['N']='S';
@@ -358,10 +358,10 @@ for(;*str;str++) {
 *str = trnslt[(int)*str];
 }
 
-}</code>
-
-
-<code>StrFlp.C
+}
+```
+```
+StrFlp.C
 /* Program ...: Strflp.C
 Version ...: dBASE III Plus 1.0, 1.1,
 dBASE IV 1.0, 1.1
@@ -383,9 +383,10 @@ p = (unsigned char *)MK_LONG(DS,BX); /* Get our string */
 if (p)
 Strflp(p);
 
-}</code>
-
-<code>Strflp(str)
+}
+```
+```
+Strflp(str)
 unsigned char *str;
 {
 /* Go through the string and subtract character ASCII value from 255
@@ -394,8 +395,10 @@ for(;*str;str++) {
 *str = (unsigned char) (((int)*str+128) % 256);
 }
 
-}</code>
-<code>StrLib.C
+}
+```
+```
+StrLib.C
 /* Program ...: Strlib.H
 Version ...: Use with
 Strdct.C
@@ -406,7 +409,6 @@ Header file which contains various definitions and information
 on how functions are called.
 
 */
-
 
 #define TURBOC 0 /* Set true if compiler supports "pseudoregisters" like
 Turbo C, this way you don't have to link in getregs.obj */
@@ -429,11 +431,11 @@ unsigned DS, BX, ES, DI, CX;
 
 #define Getregs() (DS=_DS, BX=_BX, ES=_ES, DI=_DI, CX=_CX)
 
-#endif</code>
+#endif
+```
 
-
-
-<code>; Program ...: GetRegs.asm
+```
+; Program ...: GetRegs.asm
 ; Version ...: dBASE III Plus 1.0, 1.1
 ; dBASE IV 1.0, 1.1
 ; (Tested assemblers)
@@ -471,4 +473,5 @@ _Getregs ENDP
 
 _TEXT ENDS
 CGROUP GROUP _TEXT
-END</code>
+END
+```

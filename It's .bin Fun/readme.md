@@ -72,12 +72,12 @@ We should now examine how we turn our completed and presumably tested C programs
 
 The specific steps for the two compilers mentioned are detailed below:\
 
-Borland Microsoft
-1. ALT-F9 in editor cl -c .C
-2. TASM Getregs.asm MASM Getregs.asm,,,,
-3. LINK +Getregs,,,,
-
-4. EXE2BIN
+| Borland | Microsoft | 
+|---------|-----------|
+|1. ALT-F9 in editor | cl -c .C|
+|2. TASM Getregs.asm  | MASM Getregs.asm,,,,|
+|3. LINK filename+Getregs,,,,|  |
+|4. EXE2BIN|    |
 
 The filename reference would be either StrDct, StrRev, or StrFlp and you should end up with a file like StrDct.bin, and so on. You can mix and match assemblers and compilers since they all produce the same kind of object format. You'll know something went wrong if either LINK gives an error (other than the Warning no stack message) or EXE2BIN says, File can't be converted. All these examples work so you shouldn't have any problems. One small note, if you use TURBO C and set TURBOC to 1 in Strlib.H you can eliminate steps 2 and 3 above.
 
@@ -140,15 +140,15 @@ Well that about wraps up our journey into the world of C and dBASE .bin files. I
 /* Program ...: Strrev.C
 Author ....: Erik A McBeth
 Version ...: dBASE III Plus 1.0, 1.1
-            dBASE IV 1.0, 1.1
-            (Tested compilers/assemblers)
-            Turbo C 1.5, 2.0 TASM 1.0
-            Microsoft C 5.1 MASM 5.1
-*
+             dBASE IV 1.0, 1.1
+             (Tested compilers/assemblers)
+             Turbo C 1.5, 2.0 TASM 1.0
+             Microsoft C 5.1 MASM 5.1
+*/
 
 #define EXE 0 /* Set to 1 if we want to create an exe,
-If we have an exe then run from DOS like this
-STRREV string and you'll see your string reversed */
+                If we have an exe then run from DOS like this
+                STRREV string and you'll see your string reversed */
 
 #include "strlib.h" /* Various definitions */
 
@@ -159,20 +159,23 @@ main(argc,argv)
 int argc;
 char *argv[];
 {
-unsigned char *p;
-p = (unsigned char *)argv[1];
+    unsigned char *p;
+
+    p = (unsigned char *)argv[1];
 
 #else /* Creating BIN file */
 
 void far main() /* Need a FAR return */
 {
     unsigned char *p;
+    
     Getregs(); /* Get our memory registers */
+    
     p = (unsigned char *)MK_LONG(DS,BX); /* Get our string */
 #endif /* If EXE */
 
-if (p)
-Strrev(p); /* Same operation if we do a bin or an exe */
+    if (p)
+        Strrev(p); /* Same operation if we do a bin or an exe */
 #if EXE
     printf("%s\n",p);
 #endif
@@ -182,52 +185,53 @@ Strrev(str)
 unsigned char *str;
 {
     unsigned char *p=str,ch;
-    /* Go to the end of the string and stop */
+
+/*  Go to the end of the string and stop */
     while(*++p);
-    /* Now swap the letters until we come to the middle of the string
-    */
+
+/*  Now swap the letters until we come to the middle of the string
+*/
     for(--p;p>str;p--,str++) {
-    ch = *p;
-    *p = *str;
-    *str = ch;
-}
+        ch = *p;
+        *p = *str;
+        *str = ch;
+    }
 }
 ```
 ```StrDct.C
 /* Program ...: Strdct.C
 Version ...: dBASE III Plus 1.0, 1.1
-dBASE IV 1.0, 1.1
-(Tested compilers/assemblers)
-Turbo C 1.5, 2.0 TASM 1.0
-Microsoft C 5.1 MASM 5.1
+            dBASE IV 1.0, 1.1
+            (Tested compilers/assemblers)
+            Turbo C 1.5, 2.0 TASM 1.0
+            Microsoft C 5.1 MASM 5.1
 */
-
 
 #include "strlib.h"
 
 void far main() /* very important, make sure we get a far return */
 {
 
-/* Tried to make this look familiar to 'C' programmers, Notice the
-use of argc and argv, I've set argc to have a value of 2 to
-simulate the routine being called from the DOS prompt */
+/*  Tried to make this look familiar to 'C' programmers, Notice the
+    use of argc and argv, I've set argc to have a value of 2 to
+    simulate the routine being called from the DOS prompt */
 
-int argc;
-unsigned char *argv[6];
+    int argc;
+    unsigned char *argv[6];
 
-Getregs(); /* Assign memory registers */
+    Getregs(); /* Assign memory registers */
 
-/* Translate the parameter passed by dBASE IV into something we
-can use, The argv[2] and argv[3] are placed here to show
-you how to read multiple parameters */
+/*  Translate the parameter passed by dBASE IV into something we
+    can use, The argv[2] and argv[3] are placed here to show
+    you how to read multiple parameters */
 
-argc = CX+1; /* Number of arguments */
-argv[1] = (unsigned char *)*((int *)MK_LONG(ES, DI + 0));
-argv[2] = (unsigned char *)*((int *)MK_LONG(ES, DI + 4));
-argv[3] = (unsigned char *)*((int *)MK_LONG(ES, DI + 8));
+    argc = CX+1; /* Number of arguments */
+    argv[1] = (unsigned char *)*((int *)MK_LONG(ES, DI + 0));
+    argv[2] = (unsigned char *)*((int *)MK_LONG(ES, DI + 4));
+    argv[3] = (unsigned char *)*((int *)MK_LONG(ES, DI + 8));
 
-if (argc>1) /* Do we have a string to use? */
-Strdct(argv[1]);
+    if (argc>1) /* Do we have a string to use? */
+        Strdct(argv[1]);
 
 }
 
@@ -235,128 +239,82 @@ Strdct(str)
 unsigned char *str;
 {
 
-/* Had to do it this way, couldn't do "trnslt[]={" */
+/*  Had to do it this way, couldn't do "trnslt[]={" */
 
-/* Read from AMENG.SO (Framework III). Table is case insensitive
-*/
-static unsigned char trnslt[256];
+/*  Read from AMENG.SO (Framework III). Table is case insensitive */
+    static unsigned char trnslt[256];
 
-trnslt[ 0]= 0; trnslt[ 1]= 1; trnslt[ 2]= 2; trnslt[3]= 3;
-trnslt[ 4]= 4; trnslt[ 5]= 5; trnslt[ 6]= 6; trnslt[7]= 7;
-trnslt[ 8]= 8; trnslt[ 9]= 9; trnslt[ 10]= 10; trnslt[11]= 11;
-trnslt[ 12]= 12; trnslt[ 13]= 13; trnslt[ 14]= 14; trnslt[15]= 15;
-trnslt[ 16]= 16; trnslt[ 17]= 17; trnslt[ 18]= 18; trnslt[19]= 19;
-trnslt[ 20]= 20; trnslt[ 21]= 21; trnslt[ 22]= 22; trnslt[23]= 23;
-trnslt[ 24]= 24; trnslt[ 25]= 25; trnslt[ 26]= 26; trnslt[27]= 27;
-trnslt[ 28]= 28; trnslt[ 29]= 29; trnslt[ 30]= 30; trnslt[31]= 31;
-trnslt[' ']=' '; trnslt['!']='!'; trnslt['\"']='\"';trnslt['#']='#';
-trnslt['$']='$'; trnslt['%']='%'; trnslt['&']='&';trnslt['\'']='\'';
-trnslt['(']='('; trnslt[')']=')'; trnslt['*']='*';trnslt['+']='+';
-trnslt[',']=','; trnslt['-']='-'; trnslt['.']='.';trnslt['/']='/';
-trnslt['0']='k'; trnslt['1']='l'; trnslt['2']='m';trnslt['3']='n';
-trnslt['4']='o'; trnslt['5']='p'; trnslt['6']='q';trnslt['7']='r';
-trnslt['8']='s'; trnslt['9']='t'; trnslt[':']='0';trnslt[';']='1';
-trnslt['<']='2'; trnslt['=']='3'; trnslt['>']='4';trnslt['?']='5';
-trnslt['@']='6'; trnslt['A']='7'; trnslt['B']='>';trnslt['C']='?';
-trnslt['D']='A'; trnslt['E']='B'; trnslt['F']='G';trnslt['G']='H';
-trnslt['H']='I'; trnslt['I']='J'; trnslt['J']='O';
-trnslt['K']='P';
-trnslt['L']='Q'; trnslt['M']='R'; trnslt['N']='S';
-trnslt['O']='U';
-trnslt['P']='['; trnslt['Q']='\\'; trnslt['R']=']';
-trnslt['S']='^';
-trnslt['T']='_'; trnslt['U']='`'; trnslt['V']='e';
-trnslt['W']='f';
-trnslt['X']='g'; trnslt['Y']='h'; trnslt['Z']='j';
-trnslt['[']='u';
-trnslt['\\']='w'; trnslt[']']='x'; trnslt['^']='y';
-trnslt['_']='z';
-trnslt['`']='{'; trnslt['a']='7'; trnslt['b']='>';
-trnslt['c']='?';
-trnslt['d']='A'; trnslt['e']='B'; trnslt['f']='G';
-trnslt['g']='H';
-trnslt['h']='I'; trnslt['i']='J'; trnslt['j']='O';
-trnslt['k']='P';
-trnslt['l']='Q'; trnslt['m']='R'; trnslt['n']='S';
-trnslt['o']='U';
-trnslt['p']='['; trnslt['q']='\\'; trnslt['r']=']';
-trnslt['s']='^';
-trnslt['t']='_'; trnslt['u']='`'; trnslt['v']='e';
-trnslt['w']='f';
-trnslt['x']='g'; trnslt['y']='h'; trnslt['z']='j';
-trnslt['{']='|';
-trnslt['|']='}'; trnslt['}']='~'; trnslt['~']=127;
-trnslt[127]=128;
-trnslt[128]='@'; trnslt[129]='a'; trnslt[130]='C';
-trnslt[131]=':';
-trnslt[132]='8'; trnslt[133]=';'; trnslt[134]='9';
-trnslt[135]='@';
-trnslt[136]='D'; trnslt[137]='E'; trnslt[138]='F';
-trnslt[139]='K';
-trnslt[140]='L'; trnslt[141]='M'; trnslt[142]='8';
-trnslt[143]='9';
-trnslt[144]='C'; trnslt[145]= 0; trnslt[146]= 0;
-trnslt[147]='W';
-trnslt[148]='V'; trnslt[149]='X'; trnslt[150]='b';
-trnslt[151]='c';
-trnslt[152]='i'; trnslt[153]='V'; trnslt[154]='a';
-trnslt[155]=129;
-trnslt[156]=130; trnslt[157]=131; trnslt[158]=132;
-trnslt[159]=133;
-trnslt[160]='<'; trnslt[161]='N'; trnslt[162]='Y';
-trnslt[163]='d';
-trnslt[164]='T'; trnslt[165]='T'; trnslt[166]='=';
-trnslt[167]='Z';
-trnslt[168]=134; trnslt[169]=135; trnslt[170]=136;
-trnslt[171]=137;
-trnslt[172]=138; trnslt[173]=139; trnslt[174]=140;
-trnslt[175]=141;
-trnslt[176]=142; trnslt[177]=143; trnslt[178]=144;
-trnslt[179]=145;
-trnslt[180]=146; trnslt[181]=147; trnslt[182]=148;
-trnslt[183]=149;
-trnslt[184]=150; trnslt[185]=151; trnslt[186]=152;
-trnslt[187]=153;
-trnslt[188]=154; trnslt[189]=155; trnslt[190]=156;
-trnslt[191]=157;
-trnslt[192]=158; trnslt[193]=159; trnslt[194]=160;
-trnslt[195]=161;
-trnslt[196]=162; trnslt[197]=163; trnslt[198]=164;
-trnslt[199]=165;
-trnslt[200]=166; trnslt[201]=167; trnslt[202]=168;
-trnslt[203]=169;
-trnslt[204]=170; trnslt[205]=171; trnslt[206]=172;
-trnslt[207]=173;
-trnslt[208]=174; trnslt[209]=175; trnslt[210]=176;
-trnslt[211]=177;
-trnslt[212]=178; trnslt[213]=179; trnslt[214]=180;
-trnslt[215]=181;
-trnslt[216]=182; trnslt[217]=183; trnslt[218]=184;
-trnslt[219]=185;
-trnslt[220]=186; trnslt[221]=187; trnslt[222]=188;
-trnslt[223]=189;
-trnslt[224]=190; trnslt[225]= 0; trnslt[226]=192;
-trnslt[227]=193;
-trnslt[228]=194; trnslt[229]=195; trnslt[230]=196;
-trnslt[231]=197;
-trnslt[232]=198; trnslt[233]=199; trnslt[234]=200;
-trnslt[235]=201;
-trnslt[236]=202; trnslt[237]=203; trnslt[238]=204;
-trnslt[239]=205;
-trnslt[240]=206; trnslt[241]=207; trnslt[242]=208;
-trnslt[243]=209;
-trnslt[244]=210; trnslt[245]=211; trnslt[246]=212;
-trnslt[247]=213;
-trnslt[248]=214; trnslt[249]=215; trnslt[250]=216;
-trnslt[251]=217;
-trnslt[252]=218; trnslt[253]=219; trnslt[254]=221;
-trnslt[255]=222;
-/* Go through the string and substitute the new value based on the
-value of the old character */
+    trnslt[ 0]= 0; trnslt[ 1]= 1; trnslt[ 2]= 2; trnslt[3]= 3;
+    trnslt[ 4]= 4; trnslt[ 5]= 5; trnslt[ 6]= 6; trnslt[7]= 7;
+    trnslt[ 8]= 8; trnslt[ 9]= 9; trnslt[ 10]= 10; trnslt[11]= 11;
+    trnslt[ 12]= 12; trnslt[ 13]= 13; trnslt[ 14]= 14; trnslt[15]= 15;
+    trnslt[ 16]= 16; trnslt[ 17]= 17; trnslt[ 18]= 18; trnslt[19]= 19;
+    trnslt[ 20]= 20; trnslt[ 21]= 21; trnslt[ 22]= 22; trnslt[23]= 23;
+    trnslt[ 24]= 24; trnslt[ 25]= 25; trnslt[ 26]= 26; trnslt[27]= 27;
+    trnslt[ 28]= 28; trnslt[ 29]= 29; trnslt[ 30]= 30; trnslt[31]= 31;
+    trnslt[' ']=' '; trnslt['!']='!'; trnslt['\"']='\"';trnslt['#']='#';
+    trnslt['$']='$'; trnslt['%']='%'; trnslt['&']='&';trnslt['\'']='\'';
+    trnslt['(']='('; trnslt[')']=')'; trnslt['*']='*';trnslt['+']='+';
+    trnslt[',']=','; trnslt['-']='-'; trnslt['.']='.';trnslt['/']='/';
+    trnslt['0']='k'; trnslt['1']='l'; trnslt['2']='m';trnslt['3']='n';
+    trnslt['4']='o'; trnslt['5']='p'; trnslt['6']='q';trnslt['7']='r';
+    trnslt['8']='s'; trnslt['9']='t'; trnslt[':']='0';trnslt[';']='1';
+    trnslt['<']='2'; trnslt['=']='3'; trnslt['>']='4';trnslt['?']='5';
+    trnslt['@']='6'; trnslt['A']='7'; trnslt['B']='>';trnslt['C']='?';
+    trnslt['D']='A'; trnslt['E']='B'; trnslt['F']='G';trnslt['G']='H';
+    trnslt['H']='I'; trnslt['I']='J'; trnslt['J']='O';trnslt['K']='P';
+    trnslt['L']='Q'; trnslt['M']='R'; trnslt['N']='S';trnslt['O']='U';
+    trnslt['P']='['; trnslt['Q']='\\'; trnslt['R']=']';trnslt['S']='^';
+    trnslt['T']='_'; trnslt['U']='`'; trnslt['V']='e';trnslt['W']='f';
+    trnslt['X']='g'; trnslt['Y']='h'; trnslt['Z']='j';trnslt['[']='u';
+    trnslt['\\']='w'; trnslt[']']='x'; trnslt['^']='y';trnslt['_']='z';
+    trnslt['`']='{'; trnslt['a']='7'; trnslt['b']='>';trnslt['c']='?';
+    trnslt['d']='A'; trnslt['e']='B'; trnslt['f']='G';trnslt['g']='H';
+    trnslt['h']='I'; trnslt['i']='J'; trnslt['j']='O';trnslt['k']='P';
+    trnslt['l']='Q'; trnslt['m']='R'; trnslt['n']='S';trnslt['o']='U';
+    trnslt['p']='['; trnslt['q']='\\'; trnslt['r']=']';trnslt['s']='^';
+    trnslt['t']='_'; trnslt['u']='`'; trnslt['v']='e';trnslt['w']='f';
+    trnslt['x']='g'; trnslt['y']='h'; trnslt['z']='j';trnslt['{']='|';
+    trnslt['|']='}'; trnslt['}']='~'; trnslt['~']=127;trnslt[127]=128;
+    trnslt[128]='@'; trnslt[129]='a'; trnslt[130]='C';trnslt[131]=':';
+    trnslt[132]='8'; trnslt[133]=';'; trnslt[134]='9';trnslt[135]='@';
+    trnslt[136]='D'; trnslt[137]='E'; trnslt[138]='F';trnslt[139]='K';
+    trnslt[140]='L'; trnslt[141]='M'; trnslt[142]='8';trnslt[143]='9';
+    trnslt[144]='C'; trnslt[145]= 0; trnslt[146]= 0;trnslt[147]='W';
+    trnslt[148]='V'; trnslt[149]='X'; trnslt[150]='b';trnslt[151]='c';
+    trnslt[152]='i'; trnslt[153]='V'; trnslt[154]='a';trnslt[155]=129;
+    trnslt[156]=130; trnslt[157]=131; trnslt[158]=132;trnslt[159]=133;
+    trnslt[160]='<'; trnslt[161]='N'; trnslt[162]='Y';trnslt[163]='d';
+    trnslt[164]='T'; trnslt[165]='T'; trnslt[166]='=';trnslt[167]='Z';
+    trnslt[168]=134; trnslt[169]=135; trnslt[170]=136;trnslt[171]=137;
+    trnslt[172]=138; trnslt[173]=139; trnslt[174]=140;trnslt[175]=141;
+    trnslt[176]=142; trnslt[177]=143; trnslt[178]=144;trnslt[179]=145;
+    trnslt[180]=146; trnslt[181]=147; trnslt[182]=148;trnslt[183]=149;
+    trnslt[184]=150; trnslt[185]=151; trnslt[186]=152;trnslt[187]=153;
+    trnslt[188]=154; trnslt[189]=155; trnslt[190]=156;trnslt[191]=157;
+    trnslt[192]=158; trnslt[193]=159; trnslt[194]=160;trnslt[195]=161;
+    trnslt[196]=162; trnslt[197]=163; trnslt[198]=164;trnslt[199]=165;
+    trnslt[200]=166; trnslt[201]=167; trnslt[202]=168;trnslt[203]=169;
+    trnslt[204]=170; trnslt[205]=171; trnslt[206]=172;trnslt[207]=173;
+    trnslt[208]=174; trnslt[209]=175; trnslt[210]=176;trnslt[211]=177;
+    trnslt[212]=178; trnslt[213]=179; trnslt[214]=180;trnslt[215]=181;
+    trnslt[216]=182; trnslt[217]=183; trnslt[218]=184;trnslt[219]=185;
+    trnslt[220]=186; trnslt[221]=187; trnslt[222]=188;trnslt[223]=189;
+    trnslt[224]=190; trnslt[225]= 0; trnslt[226]=192;trnslt[227]=193;
+    trnslt[228]=194; trnslt[229]=195; trnslt[230]=196;trnslt[231]=197;
+    trnslt[232]=198; trnslt[233]=199; trnslt[234]=200;trnslt[235]=201;
+    trnslt[236]=202; trnslt[237]=203; trnslt[238]=204;trnslt[239]=205;
+    trnslt[240]=206; trnslt[241]=207; trnslt[242]=208;trnslt[243]=209;
+    trnslt[244]=210; trnslt[245]=211; trnslt[246]=212;trnslt[247]=213;
+    trnslt[248]=214; trnslt[249]=215; trnslt[250]=216;trnslt[251]=217;
+    trnslt[252]=218; trnslt[253]=219; trnslt[254]=221;trnslt[255]=222;
 
-for(;*str;str++) {
-*str = trnslt[(int)*str];
-}
+/*  Go through the string and substitute the new value based on the
+    value of the old character */
+
+   for(;*str;str++) {
+      *str = trnslt[(int)*str];
+   }
 
 }
 ```
@@ -364,36 +322,34 @@ for(;*str;str++) {
 StrFlp.C
 /* Program ...: Strflp.C
 Version ...: dBASE III Plus 1.0, 1.1,
-dBASE IV 1.0, 1.1
-(Tested compilers/assemblers)
-Turbo C 1.5, 2.0 TASM 1.0
-Microsoft C 5.1 MASM 5.1
+             dBASE IV 1.0, 1.1
+             (Tested compilers/assemblers)
+             Turbo C 1.5, 2.0 TASM 1.0
+             Microsoft C 5.1 MASM 5.1
 */
 
 #include "strlib.h" /* Some definitions */
 
 void far main() /* Need a FAR return */
 {
-unsigned char *p;
+    unsigned char *p;
 
-Getregs(); /* Get our memory registers */
+    Getregs(); /* Get our memory registers */
 
-p = (unsigned char *)MK_LONG(DS,BX); /* Get our string */
+    p = (unsigned char *)MK_LONG(DS,BX); /* Get our string */
 
-if (p)
-Strflp(p);
+    if (p)
+        Strflp(p);
 
 }
-```
-```
+
 Strflp(str)
 unsigned char *str;
 {
-/* Go through the string and subtract character ASCII value from 255
-*/
-for(;*str;str++) {
-*str = (unsigned char) (((int)*str+128) % 256);
-}
+/* Go through the string and subtract character ASCII value from 255 */
+    for(;*str;str++) {
+        *str = (unsigned char) (((int)*str+128) % 256);
+    }
 
 }
 ```
@@ -401,25 +357,24 @@ for(;*str;str++) {
 StrLib.C
 /* Program ...: Strlib.H
 Version ...: Use with
-Strdct.C
-Strflp.C
-Strrev.C
+            Strdct.C
+            Strflp.C
+            Strrev.C
 
-Header file which contains various definitions and information
-on how functions are called.
+    Header file which contains various definitions and information
+    on how functions are called.
 
 */
 
 #define TURBOC 0 /* Set true if compiler supports "pseudoregisters" like
-Turbo C, this way you don't have to link in getregs.obj */
+                    Turbo C, this way you don't have to link in getregs.obj */
 
-#define MK_LONG(hi,low) (((unsigned long)(hi) << 16) |
-(unsigned)(low))
+#define MK_LONG(hi,low) (((unsigned long)(hi) << 16) | (unsigned)(low))
 #define isdigit(ch) (ch >= '0' && ch <= '9')
 #define isspace(ch) (ch==' ' || ch=='\t' || ch=='\r')
 
-/* These are function "prototypes", some compilers don't like
-these so you can delete them if they give a problem */
+/*  These are function "prototypes", some compilers don't like
+    these so you can delete them if they give a problem */
 int Strdct(unsigned char *str);
 int Strflp(unsigned char *str);
 int Strrev(unsigned char *str);
@@ -433,16 +388,14 @@ unsigned DS, BX, ES, DI, CX;
 
 #endif
 ```
-
 ```
 ; Program ...: GetRegs.asm
 ; Version ...: dBASE III Plus 1.0, 1.1
-; dBASE IV 1.0, 1.1
-; (Tested assemblers)
-; TASM 1.0
-; MASM 5.1
-; File loads global variables with the values of the actual memory
-registers.
+;              dBASE IV 1.0, 1.1
+;              (Tested assemblers)
+;              TASM 1.0
+;              MASM 5.1
+; File loads global variables with the values of the actual memory registers.
 
 _DATA SEGMENT PUBLIC 'DATA'
 

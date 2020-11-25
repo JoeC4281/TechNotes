@@ -354,7 +354,7 @@ unsigned char *str;
 }
 ```
 ```
-StrLib.C
+StrLib.H
 /* Program ...: Strlib.H
 Version ...: Use with
             Strdct.C

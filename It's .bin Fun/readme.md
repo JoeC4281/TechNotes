@@ -34,7 +34,7 @@ The next few lines deal with what would be required to make our .exe file so it 
 
 Starting after the "#else" statement we see:
 
-<code>void far main()</code>
+`void far main()`
 
 This is declaring the main starting point of our program. It is very important that we declare main() in this way. The use of the keyword "far" causes the compiler to issue a far return (RETF) at the end of the program. This type of return is needed so that dBASE IV can jump back to what it was doing before it called your .bin file. Some C enthusiasts may have noticed that we are declaring our main function as "void", which usually means we don't want to return anything to the function/program that called the routine. In this case, we are not returning anything, just jumping back to dBASE.
 

@@ -4,7 +4,7 @@ Page 5
 
 ##### No Assembly Required
 
-These four short .BIN programs for use with dBASE III PLUS can en entered with DEBUG, thus avoiding the need for an assembler.
+These four short .BIN programs for use with dBASE III PLUS can be entered with DEBUG, thus avoiding the need for an assembler.
 
 by Chuck Litzell
 

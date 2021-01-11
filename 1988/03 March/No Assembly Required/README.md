@@ -8,7 +8,7 @@ These four short .BIN programs for use with dBASE III PLUS can be entered with D
 
 by Chuck Litzell
 
-If you want to interface dBASE III PLUS or the Developer's Release with assembly language programs, you use .BIN files. The LOAD and CALL commands are provided for this purpose. Once you have LOADedd a .BIN file,  CALLing it executes the program and then returns to dBASE III PLUS. Information can be shared between shared between a dBASE program and a .BIN file by CALLing the .BIN file WITH a memory variable. The .BIN file can then read information it needs from the memory variable or store information in it to be passed back to dBASE III PLUS.
+If you want to interface dBASE III PLUS or the Developer's Release with assembly language programs, you use .BIN files. The LOAD and CALL commands are provided for this purpose. Once you have LOADed a .BIN file,  CALLing it executes the program and then returns to dBASE III PLUS. Information can be shared between shared between a dBASE program and a .BIN file by CALLing the .BIN file WITH a memory variable. The .BIN file can then read information it needs from the memory variable or store information in it to be passed back to dBASE III PLUS.
 
 In previous months, ***TechNotes*** has published many assembly language programs that can be used with dBASE III PLUS. They require the use of the MASM.EXE, LINK.EXE, and EXE2BIN.EXE programs. MASM, the Microsoft Macro Assembler program, creates an object file (.OBJ extension) from assembly language source programs. LINK processes the .OBJ file, resulting in an .EXE file. The EXE2BIN program creates a .BIN file, which dBASE III PLUS can use, from the .EXE file.
 
@@ -81,7 +81,17 @@ Since Cchart is so specific, you might not want to bother creating it. Setcolor 
 
 ##### **Sample Programs**
 
-To make practical use of Attrib, you'll need a way to
+To make practical use of Attrib, you'll need a way to translate the values it returns into SET COLOR commands. Colorutl.PRG is a procedure file that contains a pair of procedures--Getcolor and Decode--that take care of this task. Getcolor uses Attrib and Decode to determine the current color settings for both the normal colors and enhanced colors. These values are translated into a string that can be used with the SET COLOR command when your program completes. To use Getcolor, you need to create a character memory variable to hold the color list, then execute the program.
+
+```dos
+usercolor = ""
+SET PROCEDURE TO Colorutl
+DO Getcolor WITH usercolor
+```
+
+Getcolor uses the first position on the screen (0,0) to display a space with the enhanced colors, and then a space with the normal colors. Attrib reads the color values from the display. The program leaves a space in position (0,0) when it has finished. If some other character belongs in this position in your application, you will need to restore it when Getcolor has finished, or change the coordinates in Getcolor to a position that will not disturb the display.
+
+The Decode procedure creates part of a SET COLOR string by translating two numbers, a foreground color and a background color, into the equivalent letter codes. Decode uses ISCOLOR() to determine if the display adatper is color or monochrome, and translates the numbers accordingly. There are 256 different color combinations when a color display adapter is in use, but a monochrome adapter can display only 16 combinations of white, black, blink, underline, and bright. Therefore, Decode uses two quite different algorithms to translate from numbers to letters. When a color display adapter is in use, Decode extracts the letters from a string. With a monochrome adapter, a DO CASE is used to test for specific attributes.
 
 ```dos
 ATTRIB.DBG

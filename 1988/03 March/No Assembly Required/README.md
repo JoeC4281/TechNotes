@@ -63,3 +63,51 @@ When Go returns, the first character of the memory variable contains the selecte
 
 ##### Click...Click
 Clickstr.BIN is basically for fun, but fun programs make users happy and keep programmers solvent. Clickstr displays a string with an audible click for each character, giving the appearance that the string is being typed out. It can be used when you want  the user to take special note of a message, such as an error or exception message.
+
+The string is displayed beginning at the cursor position. The characters are displayed using the existing colors. Clickstr controls the delay between characters by monitoring the system clock. Though the pitch of the click will vary, the rate at which the string is displayed will be constant regardless of the speed of the CPU on which the program runs.
+
+```dos
+LOAD Clickstr
+* ---Position cursor to starting column.
+@ 10, 12 say ""
+CALL Clickstr WITH "Welcome to WonderWizz"
+RELEASE MEMORY Clickstr
+```
+
+##### Chart of Many Colors
+Cchart.BIN is a program that meets a very specific need. It displays the 256 possible color comination in a 16-column by 16-row chart, with the upper-left column at the current cursor position. It was written specifically for use by Setcolor.PRG, the demonstration program that makes use of all four .BIN files.
+
+Since Cchart is so specific, you might not want to bother creating it. Setcolor tests for the existence of Cchart.BIN. If it doesn't exist, the color chart will be drawn with dBASE III PLUS commands instead. Since there are 256 colors possible, 256 SET COLOR commands must be interpreted and executed, and the color chart may take as long as a minute to be drawn. On the other hand, if you create Cchart.BIN the chart is drawn almost instantly.
+
+##### **Sample Programs**
+
+To make practical use of Attrib, you'll need a way to
+
+```dos
+ATTRIB.DBG
+NATTRIB.BIN
+A100
+PUSH AX
+PUSH CX
+PUSH BX
+MOV AH,08
+MOV BH,00
+INT 10
+MOV AL,AH
+AND AL,0F
+MOV CL,04
+SHR AH,CL
+INC AL
+INC AH
+POP BX
+MOV [BX],AL
+MOV [01+BX],AH
+POP CX
+POP AX
+RETF
+
+RCX
+1E
+W
+Q
+```

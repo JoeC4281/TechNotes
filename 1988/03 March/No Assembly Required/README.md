@@ -93,6 +93,129 @@ Getcolor uses the first position on the screen (0,0) to display a space with the
 
 The Decode procedure creates part of a SET COLOR string by translating two numbers, a foreground color and a background color, into the equivalent letter codes. Decode uses ISCOLOR() to determine if the display adatper is color or monochrome, and translates the numbers accordingly. There are 256 different color combinations when a color display adapter is in use, but a monochrome adapter can display only 16 combinations of white, black, blink, underline, and bright. Therefore, Decode uses two quite different algorithms to translate from numbers to letters. When a color display adapter is in use, Decode extracts the letters from a string. With a monochrome adapter, a DO CASE is used to test for specific attributes.
 
+Decode is used by Getcolor and Setcolor, the sample program. It has three parameters; foreground color, background color, and a character memory variable to hold the result. The color numbers must be between 0 and 15.
+
+```dos
+mycolor = ""
+SET PROCEDURE TO Colorutl
+DO Decode WITH 7, 1, mycolor
+```
+
+Mycolor will contain "W/B" when these lines have been executed.
+
+Setcolor.PRG is a program that demonstrates all four of the .BIN files, as well as the two procedures in Colorutil (Figure 1). With Setcolor a user can interactively select normal and enhanced colors from a display. Though it performs the same function as the SetScreen menu, Setcolor can be called directly from a program, and can be used with dBRUN III PLUS, in which the Set menu is not available.
+
+Setcolor uses Attrib to identify the current color settings. With Cchart, it displays the 256 possible combinations of foreground and background colors, and then lets the user select a combination from the display with Go. Instructions are delivered to the user with Clickstr. Go is used a second time to select from a menu of program exit choices.
+
+Before you execute Setcolor, the following five files must exist on the current drive and directory or in the dBASE path:
+
+* Setcolor.PRG
+* Colorutl.PRG
+* Attrib.BIN
+* Go.BIN
+* Clickstr.BIN
+
+If Cchart.BIN exists and can be found, it too will be used. Execute Setcolor by typing
+
+```dos
+DO Setcolor
+```
+
+at the dot prompt, or by including this line in your own program.
+
+##### Creating the .BIN Files
+
+DEBUG.COM, which you will find on the DOS Supplemental Programs Diskette, should be in the current directory or available in the DOS path. If it isn't, copy it to the appropriate directory. To create a DEBUG script file, you'll need an ASCII text editor, or you can use MODIFY FILE and the filename at the dot prompt. Enter the lines for the script file from the end of this article into the text file. The script files have been given a .DBG file extension in order to identify them more easily.
+
+More than ever before, it is important to copy the script lines *exactly*. If lines are omitted or duplicated, DEBUG will probably not catch the error, and the resulting .BIN file will almost certainly hang your computer when called from dBASE III PLUS. There is a common format to all of the script files:
+
+```dos
+Nxxxxxxx.BIN
+A100
+.
+. (Assembler instructions)
+.
+
+RCX
+xxxx
+W
+Q
+```
+
+The first line, beginning with N, names the .BIN file. The second line tells DEBUG to begin accepting assembly language instructions. Following the assembler instructions is a blank line, which tells DEBUG to stop assembling. If this line is omitted, DEBUG will attempt to assemble the remaining lines as assembly instructions (which they are not) and errors will occur.
+
+The RCX line, and the line that follows, tell DEBUG how many bytes are in the .BIN file. The W command writes the new .BIN file to disk and the Q command quits DEBUG. Make sure you place a carriage return after the  Q or you will be left hanging in DEBUG after the .BIN file has been created.
+
+Once you've created a script file, you can create the .BIN file with the command:
+
+```dos
+DEBUG < SCRIPT.DBG
+```
+
+where SCRIPT.DBG is the name of the script file you've created. If everything goes well, the DEBUG session will be scrolled across the screen, the .BIN file will be created and you will be returned to the DOS prompt.
+
+##### Creating the Sample Programs
+
+Create Getcolor and Colorutl by entering the source code into the two .PRG files. You can use MODIFY COMMAND or another text editor.
+
+```dos
+SETCOLOR.PRG
+* Program ...: Setcolor.PRG
+* Author ....: Chuck Litzell
+* Date ......: March 1, 1988
+* Versions ..: dBASE III PLUS or Developer's Release.
+* Notes .....: Sample program to demonstrate use of Attrib.BIN,
+*              Go.BIN, Clickstr.BIN and cChart.BIN.
+*              Setcolor is an interactive program to set the normal
+*              and enhanced colors in dBASE III PLUS. It uses
+*              Attrib.BIN to find the current settings, then uses
+*              Go.BIN to control selection of the new colors from a
+*              color chart on the screen. Go.BIN is also used to
+*              select from a "pop-up" exit menu. Clickstr is used to
+*              display the prompts. If you don't want to use Clickstr
+*              you could collapse the @...SAY and CALL Clickstr lines
+*              into one and eliminate the CALL.
+*
+SET TALK OFF
+SET STATUS OFF
+SET PROCEDURE TO Colorutl
+LOAD Go
+LOAD Clickstr
+binchart = FILE("Cchart.BIN")
+IF binchart
+  LOAD Cchart
+ENDIF
+* ---Find out current color settings.
+original = ""
+DO Getcolor WITH original
+* ---Separate out foreground and background.
+onorm = LEFT(original, AT(",", original) - 1)
+oenha = STUFF(original, 1, AT(",", original), "")
+* ---Draw background screen.
+SET COLOR TO
+CLEAR
+@   3,  5 TO 17, 74 DOUBLE
+@   2,  8 TO  4, 28 DOUBLE
+@   3,  9 CLEAR TO 18, 47
+@   2, 31 TO 19, 48 DOUBLE
+@   3, 32 CLEAR TO 18, 47
+@   3, 14 SAY "SET COLOR"
+* ---Draw sample box for normal colors.
+*
+SET COLOR TO &onorm
+@   6,   7 CLEAR TO 15, 29
+@   6,   8 TO 15, 28 DOUBLE
+@  10,   9 SAY "    N O R M A L   "
+@  11,   9 SAY "    C O L O R S   "
+SET COLOR TO
+@ 16,  7 CLEAR TO 16, 29
+@ 16, (22 - LEN(onorm)) / 2 + 7 SAY onorm
+* ---Draw sample box for enhanced colors.
+SET COLOR TO &oenha
+
+```
+
+
 ```dos
 ATTRIB.DBG
 NATTRIB.BIN

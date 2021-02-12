@@ -158,8 +158,8 @@ where SCRIPT.DBG is the name of the script file you've created. If everything go
 
 Create Getcolor and Colorutl by entering the source code into the two .PRG files. You can use MODIFY COMMAND or another text editor.
 
+##### SETCOLOR.PRG
 ```dos
-SETCOLOR.PRG
 * Program ...: Setcolor.PRG
 * Author ....: Chuck Litzell
 * Date ......: March 1, 1988
@@ -212,12 +212,171 @@ SET COLOR TO
 @ 16, (22 - LEN(onorm)) / 2 + 7 SAY onorm
 * ---Draw sample box for enhanced colors.
 SET COLOR TO &oenha
+@  6, 50 CLEAR TO 15, 72
+@  6, 51 TO 15,  71 DOUBLE
+@ 10, 52 SAY "  E N H A N C E D  "
+@ 11, 52 SAY "    C O L O R S    "
+SET COLOR TO
+@ 16, 51 CLEAR TO 16, 71
+@ 16, (22 - LEN(oenha)) / 2 + 51 SAY oenha
+IF binchart
+   * ---Use the bin solution, if it's available.
+   @ 3, 32 SAY ""
+   CALL Cchart
+ELSE
+  * ---dBASE Code to draw color chart.
+  * ---The outside DO WHILE loop controls the rows, and the
+  * ---inside loop controls the columns. Background varies by
+  * ---row and foreground varies by column.
+  rowndx = 1
+  temp = ""
+  DO WHILE rowndx < 17
+    colndx = 1
+    @ rowndx + 2, 32 SAY SPACE(0)
+    DO WHILE colndx < 17
+      DO Decode WITH rowndx - 1, colndx - 1, temp
+      SET COLOR TO &temp
+      @ ROW(), COL() SAY CHR(4)
+      colndx = colndx + 1
+    ENDDO
+    rowndx = rowndx + 1
+  ENDDO
+ENDIF
+* ---Set up default colors.
+ncolor = onorm
+ecolor = oenha
+* ---Initial cursor position.
+lastr = 3
+lastc = 33
+* ---Main input loop.
+DO WHILE .T.
+  @ 14,  10 SAY ""
+  CALL Clickstr WITH "SET NORMAL COLORS"
+  * ---Confine cursor to region from 3, 32 TO 18, 47
+  * ---Since we can't pass a CHR(0) to Go.BIN, the coordinates
+  * ---are offset by 1.
+  temp = CHR(3 + 1) + CHR(32 + 1) + CHR(18 + 1) + CHR(47 + 1)
+  @ lastr, lastc SAY ""
+  CALL Go WITH temp
+  IF ASC(SUBSTR(temp, 3)) = 13
+    * ---If Return was pressed to exit, extract row and
+    * ---column indices and adjust for color numbers.
+    lastr = AC(temp) - 1
+    lastc = ASC(SUBSTR(temp, 2)) - 1
+    DO Decode WITH lastc - 32, Lastr - 3, nocolor
+  ENDIF
+  * ---Display new sample for normal colors.
+  SET COLOR TO &ncolor
+  @  6,  7 CLEAR TO 15, 29
+  @  6,  8 TO 15, 28 DOUBLE
+  @ 10,  9 SAY "    N O R M A L    "
+  @ 11,  9 SAY "    C O L O R S    "
+  SET COLOR TO
+  @ 16,  7 CLEAR TO 16, 29
+  @ 16, (22 - LEN(ncolor)) / 2 + 7 SAY ncolor
+  *
+  * ---Select enhanced colors in the same way.
+  *
+  @ 14, 52 SAY ""
+  CALL Clickstr WITH "SET ENHANCED COLORS"
+  temp = CHR(3 + 1) + CHR(32 + 1) + CHR(18 + 1) + CHR(47 + 1)
+  @ lastr, lastc SAY ""
+  CALL Go WITH temp
+  IF ASC(SUBSTR(temp, 3)) = 13
+     * ---If Return was pressed to exit, set up new
+     * ---enhanced colors.
+     lastr = ASC(temp) - 1
+     lastc = ASC(SUBSTR(temp, 2)) - 1
+     DO Decode WITH lastc - 32, lastr - 3, ecolor
+  ENDIF
+  * ---Display new sample for normal colors.
+  SET COLOR TO &ecolor
+  @  6, 50 CLEAR TO 15, 72
+  @  6, 51 TO 15, 71 DOUBLE
+  @ 10, 52 SAY "  E N H A N C E D "
+  @ 11, 52 SAY "    C O L O R S   "
+  SET COLOR TO
+  @ 16, 51 CLEAR TO 16, 71
+  @ 16, (22 - LEN(ecolor)) / 2 + 51 SAY ecolor
+  * ---Draw the "popup" menu.
+  SET COLOR TO
+  @ 17, 58 TO 21, 66 DOUBLE
+  @ 18, 59 CLEAR TO 18, 65
+  @ 18, 60 SAY "Set"
+  @ 19, 60 SAY "Redo"
+  @ 20, 60 SAY "Cancel"
+  * ---Confine cursor to the three rows and the single column to
+  * ---the left of the three menu selections.
+  temp = CHR(18 + 1) + CHR(59 + 1) + CHR(20 + 1) + CHR(59 + 1)
+  CALL Go WITH temp
+  * ---Erase the popup menu.
+  @ 17, 58 CLEAR TO 21, 69
+  @ 17, 58 TO 17, 69 DOUBLE
+  * ---Process the menu selection.
+  DO CASE
+  CASE ASC(temp) = 21 .OR. ASC(SUBSTR(temp, 3)) = 27
+       * ---Return was pressed on Row 20, "Cancel",
+       * ---or Escape was pressed.
+       * ---Restore original colors and quit.
+       SET COLOR TO &original
+       EXIT
+  CASE ASC(temp) = 19
+       * ---Return was pressed on Row 18, "Set".
+       * ---Set the new colors and quit
+       SET COLOR TO &ncolor, &ecolor
+       EXIT
+  CASE ASC(temp) =20
+       * ---Cursor was pressed on Row 19, "Redo"
+       * ---Go back to top of loop.
+       LOOP
+  ENDCASE
+ENDDO
+CLEAR
+RELEASE MODULE Go
+RELEASE MODULE Clickstr
+IF binchart
+  RELEASE MODULE CChart
+ENDIF
+CLOSE PROCEDURE
+RETURN
+* EOP: Setcolor.PRG
+```
+##### COLORUTL.PRG
+```dos
+PROCEDURE Getcolor
+* Notes(s) ...: Returns a string as appropriate for SET COLOR TO...
+*               which represents current color settings. Uses Attrib.BIN
+*               to read attributes from the screen. Alters the display
+*               cell at row 0, column 0.
+*
+PARAMETERS colornow
+LOAD Attrib
+* ---A space for testing colors.
+test = SPACE(1)
+* ---Strings to pass to Attrib.BIN
+normal   = SPACE(2)
+enhanced = SPACE(2)
+* ---Display test space with enchanced color setting.
+@ 0, 0 GET test
+CLEAR GETS
+* ---Put cursor on the space.
+@ 0, 0 SAY SPACE(0)
+CALL Attrib WITH enhanced
+* ---Display test space with normal color setting.
+@ 0, 0 SAY test
+* ---Put cursor on the space.
+@ 0, 0 SAY SPACE(0)
+CALL Attrib WITH normal
+DO Decode WITH ASC(normal) - 1,   ASC(SUBSTR(normal, 2)) - 1, normal
+DO Decode WITH ASC(enhanced) - 1, ASC(SUBSTR(enhanced, 2)) - 1, enhanced
+colornow = normal + "," + enhanced
+RELEASE MODULE Attrib
+RETURN
+* EOP: Getcolor
 
 ```
-
-
+##### ATTRIB.DBG
 ```dos
-ATTRIB.DBG
 NATTRIB.BIN
 A100
 PUSH AX
@@ -241,6 +400,218 @@ RETF
 
 RCX
 1E
+W
+Q
+```
+##### CCHART.DBG
+```dos
+NCCHART.BIN
+A100
+PUSH AX
+PUSH BX
+PUSH CX
+PUSH DX
+CALL 0131
+MOV CX,0010
+MOV BL,00
+PUSH CX
+MOV CX,0010
+CALL 013C
+MOV AL,04
+MOV AH,09
+MOV BH,00
+INT 10
+INC BL
+INC DL
+LOOP 0110
+POP CX
+AND BL,F0
+SUB DL,10
+INC DH
+LOOP 010C
+POP DX
+POP CX
+POP BX
+POP AX
+RETF
+PUSH AX
+PUSH BX
+MOV AH,03
+MOV BH,00
+INT 10
+POP BX
+POP AX
+RET
+PUSH AX
+PUSH BX
+PUSH DX
+MOV AH,02
+MOV BH,00
+INT 10
+POP DX
+POP BX
+POP AX
+RET
+
+RCX
+49
+W
+Q
+```
+##### CLICKSTR.DBG
+```dos
+NCLICKSTR.BIN
+A100
+PUSH AX
+PUSH BX
+PUSH SI
+MOV SI,BX
+LODSB
+OR AL,AL
+JZ 0116
+MOV AH,0E
+INT 10
+CALL 011A
+CALL 0137
+JMP 0105
+POP SI
+POP BX
+POP AX
+RETF
+PUSH AX
+PUSH CX
+CLI
+IN AL,61
+AND AL,FE
+OR AL,02
+OUT 61,AL
+MOV CX,01F4
+LOOP 0128
+AND AL,FD
+OUT 61,AL
+MOV CX,01F4
+LOOP 0131
+STI
+POP CX
+POP AX
+RET
+PUSH AX
+PUSH BX
+PUSH DX
+XOR AX,AX
+INT 1A
+ADD DX,01
+MOV BX,DX
+INT 1A
+CMP DX,BX
+JNZ 0143
+POP DX
+POP BX
+POP AX
+RET
+
+RCX
+4D
+W
+Q
+```
+GO.DBG
+```dos
+NGO.BIN
+A 100
+PUSH AX
+PUSH CX
+PUSH DX
+PUSH BX
+MOV DH,[BX]
+MOV DL,[BX+1]
+MOV CH,[BX+2]
+MOV CL,[BX+3]
+DEC DH
+DEC DL
+DEC CH
+DEC CL
+MOV BX,DX
+CALL 019F
+CALL 01A8
+CMP AL,0D
+JZ 0191
+CMP AL,00
+JNZ 0119
+CMP AH,4B
+JNZ 0131
+DEC DL
+JMP 0177
+NOP
+CMP AH,4D
+JNZ 013B
+INC DL
+JMP 0177
+NOP
+CMP AH,48
+JNZ 0145
+DEC DH
+JMP 0177
+NOP
+CMP AH,50
+JNZ 014F
+INC DH
+JMP 0177
+NOP
+CMP AH,47
+JNZ 0159
+MOV DL,BL
+JMP 0177
+NOP
+CMP AH,4F
+JNZ 0163
+MOV DL,CL
+JMP 0177
+NOP
+CMP AH,49
+JNZ 016D
+MOV DH,BH
+JMP 0177
+NOP
+CMP AH,51
+JNZ 0119
+MOV DH,CH
+JMP 0177
+NOP
+CMP DH,BH
+JGE 017D
+MOV DH,CH
+CM DL,BL
+JGE 0183
+MOV DL,CL
+CMP DH,CH
+JLE 0189
+MOV DH,BH
+CMP DL,CL
+JLE 018F
+MOV DL,BL
+JMP 0119
+POP BX
+INC DH
+INC DL
+MOV [BX],DH
+MOV [BX+1],DL
+POP DX
+POP CX
+POP AX
+RETF
+PUSH BX
+MOV BH,0
+MOV AH,2
+INT 10
+POP BX
+RET
+MOV AH,0
+INT 16
+RET
+
+RCX
+AD
 W
 Q
 ```

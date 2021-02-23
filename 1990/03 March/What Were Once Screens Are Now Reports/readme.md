@@ -1,5 +1,4 @@
-What Were Once Screens
-Are Now Reports
+# What Were Once Screens Are Now Reports
 
 BRYAN FLYNN
 
@@ -40,7 +39,7 @@ at the end of this article will take an existing screen form
 can then be used in conjunction with the REPORT FORM command or
 run from the Control Center.
 
-A Brief Explanation of the Template Language
+##### A Brief Explanation of the Template Language
 
 The Template Language takes dBASE IV design files (in our case
 the .SCR file) and generates either documentation or program
@@ -106,7 +105,7 @@ A more complete explanation of the Template Language can be found
 in the Developer's Edition manual entitled Using the Template
 Language.
 
-How to use Scr2Frg.GEN
+##### How to use Scr2Frg.GEN
 
 Begin by either typing in the listed template code at the end of
 this article or retrieving it from the Ashton-Tate Electronic
@@ -166,7 +165,7 @@ design file (.FRM) is created. The report you create using the
 Scr2Frg.GEN file cannot be modified via MODIFY REPORT since the
 initial design data was from the screen form.
 
-Scr2Frg.COD Usage Notes
+##### Scr2Frg.COD Usage Notes
 * Scr2Frg will create a report that looks exactly like your
 screen (except for the status bar). This also includes
 memos in windows looking exactly the same.
@@ -238,14 +237,12 @@ that custom made templates can be as simple or complex as you
 wish and while it might take some time to write a template, the
 time saved in developing a system or the added flexibility to a
 system could more than compensate.
-
-
-
+```dos
 //
 // Module Name: SCR2FRG.COD
 // Description: This file will convert .SCR files to .FRG files,
-// Enabling the user to print Screen Forms with the
-// REPORT FORM command.
+//              Enabling the user to print Screen Forms with the
+//              REPORT FORM command.
 //
 //
 
@@ -254,8 +251,8 @@ FORMAT to REPORT (.scr -> .frg) File Template
 Written by Bryan Flynn, Ashton-Tate Software Support
 
 Notes: o The SUMMARY option is not supported and has no effect if specified.
-o ".PB" in the first column of a screen line will insert a page break
-at that point.
+       o ".PB" in the first column of a screen line will insert a page break
+         at that point.
 {
 include "form.def"; // Form selectors
 include "builtin.def"; // Builtin functions
@@ -269,42 +266,34 @@ pause(wrong_class + any_key);
 goto NoGen;
 endif
 
-var frg_name, // Format file name
-crlf, // line feed
-temp, // tempory work variables
-line_cnt, // Count for total lines processed
-default_drv,// dBASE default drive
-scrn_size, // Screen size when generation starts
-scrn_size2, // = 43 or 25
-display, // Type of display screen we are on
-dB_status, // dBASE status bar (on|off) before entering designer
-maxrow, // Used for blank lines
-box_ht, // HEIGHT of DEFINEd BOXes
-is_memo, // How many memos w/ windows are currently being printed
-no_AT, // Don't print AT location if memo marker
-avail_stck, // Stack to hold which set of memo variables is available
-used_stck, // Stack to hold which set of memo variables is being used
-// memo#_1 = Holds expression for printout of memos
-// memo#_2 = What line of memo to print
-// memo#_3 = How many lines of memo to print
+var frg_name,     // Format file name
+    crlf,         // line feed
+    temp,         // tempory work variables
+    line_cnt,     // Count for total lines processed
+    default_drv,  // dBASE default drive
+    scrn_size,    // Screen size when generation starts
+    scrn_size2,   // = 43 or 25
+    display,      // Type of display screen we are on
+    dB_status,    // dBASE status bar (on|off) before entering designer
+    maxrow,       // Used for blank lines
+    box_ht,       // HEIGHT of DEFINEd BOXes
+    is_memo,      // How many memos w/ windows are currently being printed
+    no_AT,        // Don't print AT location if memo marker
+    avail_stck,   // Stack to hold which set of memo variables is available
+    used_stck,    // Stack to hold which set of memo variables is being used
+                  // memo#_1 = Holds expression for printout of memos
+                  // memo#_2 = What line of memo to print
+                  // memo#_3 = How many lines of memo to print
 // Screen can have up to 26 memo windows next to each other at any one time.
 // Arrays not supported in the Template Language
-memo1_1, memo1_2, memo1_3, memo2_1, memo2_2, memo2_3, memo3_1, memo3_2,
-memo3_3,
-memo4_1, memo4_2, memo4_3, memo5_1, memo5_2, memo5_3, memo6_1, memo6_2,
-memo6_3,
-memo7_1, memo7_2, memo7_3, memo8_1, memo8_2, memo8_3, memo9_1, memo9_2,
-memo9_3,
-memo10_1, memo10_2, memo10_3,memo11_1, memo11_2, memo11_3,memo12_1, memo12_2,
-memo12_3,
-memo13_1, memo13_2, memo13_3,memo14_1, memo14_2, memo14_3,memo15_1, memo15_2,
-memo15_3,
-memo16_1, memo16_2, memo16_3,memo17_1, memo17_2, memo17_3,memo18_1, memo18_2,
-memo18_3,
-memo19_1, memo19_2, memo19_3,memo20_1, memo20_2, memo20_3,memo21_1, memo21_2,
-memo21_3,
-memo22_1, memo22_2, memo22_3,memo23_1, memo23_2, memo23_3,memo24_1, memo24_2,
-memo24_3,
+memo1_1, memo1_2, memo1_3, memo2_1, memo2_2, memo2_3, memo3_1, memo3_2,memo3_3,
+memo4_1, memo4_2, memo4_3, memo5_1, memo5_2, memo5_3, memo6_1, memo6_2,memo6_3,
+memo7_1, memo7_2, memo7_3, memo8_1, memo8_2, memo8_3, memo9_1, memo9_2,memo9_3,
+memo10_1, memo10_2, memo10_3,memo11_1, memo11_2, memo11_3,memo12_1, memo12_2,memo12_3,
+memo13_1, memo13_2, memo13_3,memo14_1, memo14_2, memo14_3,memo15_1, memo15_2,memo15_3,
+memo16_1, memo16_2, memo16_3,memo17_1, memo17_2, memo17_3,memo18_1, memo18_2,memo18_3,
+memo19_1, memo19_2, memo19_3,memo20_1, memo20_2, memo20_3,memo21_1, memo21_2,memo21_3,
+memo22_1, memo22_2, memo22_3,memo23_1, memo23_2, memo23_3,memo24_1, memo24_2,memo24_3,
 memo25_1, memo25_2, memo25_3,memo26_1, memo26_2, memo26_3;
 
 //-----------------------------------------------
@@ -312,7 +301,7 @@ memo25_1, memo25_2, memo25_3,memo26_1, memo26_2, memo26_3;
 //-----------------------------------------------
 is_memo = 0;
 avail_stck=" 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,17,18,19,20,21," +
-"22,23,24,25,26,";
+           "22,23,24,25,26,";
 used_stck="";
 
 crlf = chr(10);
@@ -327,11 +316,11 @@ if display > ega25 then scrn_size = 39 else scrn_size = 21 endif;
 scrn_size2 = scrn_size + 4;
 dB_status = numset(_flgstatus); // _flgstatus defined in BUILTIN.DEF
 if scrn_size == 21 and !dB_status then
-scrn_size = 24;
+  scrn_size = 24;
 endif
 //else
 if scrn_size == 39 and !dB_status then // STATUS is off
-scrn_size = 42;
+  scrn_size = 42;
 endif
 
 //-------------------------------
@@ -341,21 +330,20 @@ default_drv = strset(_defdrive); // Grab default drive from dBASE
 
 frg_name = FRAME_PATH + NAME;
 if not fileok(frg_name) then
-if !default_drv then
-frg_name = NAME;
-else
-frg_name = default_drv + ":" + NAME;
-endif
+  if !default_drv then
+    frg_name = NAME;
+  else
+    frg_name = default_drv + ":" + NAME;
+  endif
 endif
 frg_name = upper(frg_name);
 if not create(frg_name+".FRG") then
-pause(fileroot(frg_name) +".FRG" + read_only + any_key);
-goto nogen;
+  pause(fileroot(frg_name) +".FRG" + read_only + any_key);
+  goto nogen;
 endif
 if not fileexist(frg_name+".FMT") then
-cursor_pos(2, 1);
-cput("You don't have a FORMAT file by this name. Ignore 'File does not
-exist' error");
+  cursor_pos(2, 1);
+  cput("You don't have a FORMAT file by this name. Ignore 'File does not exist' error");
 endif
 }
 //
@@ -389,22 +377,21 @@ _plineno=0
 
 *--- Set NOEJECT parameter of the REPORT FORM command.
 if m_NoEject
-IF _peject = "BEFORE"
-_peject = "NONE"
-ENDIF
-IF _peject = "BOTH"
-_peject = "AFTER"
-ENDIF
+  IF _peject = "BEFORE"
+    _peject = "NONE"
+  ENDIF
+  IF _peject = "BOTH"
+    _peject = "AFTER"
+  ENDIF
 ENDIF
 
 *--- Set-up environment
-ON ESCAPE DO PrnAbort &&Do procedure PRNABORT if ESC is pressed when
-printing.
+ON ESCAPE DO PrnAbort &&Do procedure PRNABORT if ESC is pressed when printing.
 IF SET("TALK") = "ON" &&Save status of TALK so it can be restored later.
-SET TALK OFF
-m_Talk = "ON"
+  SET TALK OFF
+  m_Talk = "ON"
 ELSE
-m_Talk = "OFF"
+  m_Talk = "OFF"
 ENDIF
 m_Width = SET("MEMOWIDTH") &&Save current memowidth setting.
 SET MEMOWIDTH TO 65 &&When printing memos, memowidth must be 65.
@@ -412,9 +399,9 @@ m_Prntflg = .T. &&Set to FALSE when user presses ESCAPE.
 
 *--- Set up when to page break.
 IF _pspacing > 1
-m_Atline= _plength - (_pspacing + 1)
+  m_Atline= _plength - (_pspacing + 1)
 ELSE
-m_Atline= _plength - 1
+  m_Atline= _plength - 1
 ENDIF
 ON PAGE AT LINE m_Atline EJECT PAGE
 
@@ -422,28 +409,28 @@ ON PAGE AT LINE m_Atline EJECT PAGE
 PRINTJOB
 
 IF .NOT. m_Plain .AND. LEN(m_Heading) > 0
-?? m_Heading FUNCTION "I;V80"
-?
+  ?? m_Heading FUNCTION "I;V80"
+  ?
 ENDIF
 
 ON PAGE AT LINE m_Atline DO Pgfoot
 
 *--- File Loop
 DO WHILE m_Prntflg && FOUND() .AND. .NOT. EOF() .AND. m_Prntflg
-DO __Detail
-CONTINUE
-IF FOUND() .AND. .NOT. EOF() .AND. m_Prntflg .AND. _pageno <= _pepage
-EJECT PAGE && EJECT occurrs after each record
-ELSE && Don't want to print HEADING after last record
-ON PAGE
-EJECT PAGE
-EXIT
-ENDIF
+  DO __Detail
+  CONTINUE
+  IF FOUND() .AND. .NOT. EOF() .AND. m_Prntflg .AND. _pageno <= _pepage
+    EJECT PAGE && EJECT occurrs after each record
+  ELSE && Don't want to print HEADING after last record
+    ON PAGE
+    EJECT PAGE
+    EXIT
+  ENDIF
 ENDDO
 
 IF .NOT. m_Prntflg && User pressed the escape key while printing
-DO RESET
-RETURN
+  DO RESET
+  RETURN
 ENDIF
 
 ENDPRINTJOB
@@ -454,7 +441,7 @@ RETURN
 
 *--- Executed when user presses ESCAPE while report is running.
 PROCEDURE Prnabort
-m_Prntflg = .F.
+  m_Prntflg = .F.
 RETURN
 *--- EOP: Prnabort
 
@@ -462,41 +449,39 @@ RETURN
 *--- Note that any ON ESCAPE or ON PAGE routine user had before
 *--- running the REPORT FORM command will be cleared.
 PROCEDURE Reset
-SET TALK &m_Talk
-SET MEMOWIDTH TO m_Width
-ON ESCAPE
+  SET TALK &m_Talk
+  SET MEMOWIDTH TO m_Width
+  ON ESCAPE
 RETURN
 *--- EOP: Reset
 
 PROCEDURE __Detail
-{maxrow = line_cnt = 0;
-FOREACH ELEMENT form_object
-if ROW_POSITN - line_cnt > scrn_size then
-line_cnt = line_cnt + scrn_size + 1;
-endif
-nextline:
-if maxrow < ROW_POSITN then
-outmemo();}
-?
-{ ++maxrow;
-goto nextline;
-endif
-no_AT=0; // "?? ... AT ## " should not be outputted if item is a memo with
-a window
-case ELEMENT_TYPE of
-@TEXT_ELEMENT:
-if asc(TEXT_ITEM) < 32 then // Control character - use CHR()
-if len(TEXT_ITEM) == 1 then}
-?? CHR({asc(TEXT_ITEM)}) AT {nul2zero(COL_POSITN)}
-{ else}
-?? REPLICATE(CHR({asc(TEXT_ITEM)}), {len(TEXT_ITEM)}) AT
-{nul2zero(COL_POSITN)}
-{ endif
-else
-if nul2zero(COL_POSITN) == 0 and len(TEXT_ITEM) >=3 and
-upper(substr(TEXT_ITEM, 1, 3)) == ".PB" then
-// User specified page break}
-EJECT PAGE
+  {maxrow = line_cnt = 0;
+  FOREACH ELEMENT form_object
+    if ROW_POSITN - line_cnt > scrn_size then
+      line_cnt = line_cnt + scrn_size + 1;
+    endif
+  nextline:
+  if maxrow < ROW_POSITN then
+    outmemo();}
+    ?
+    { ++maxrow;
+    goto nextline;
+  endif
+  no_AT=0; // "?? ... AT ## " should not be outputted if item is a memo with a window
+  case ELEMENT_TYPE of
+    @TEXT_ELEMENT:
+      if asc(TEXT_ITEM) < 32 then // Control character - use CHR()
+        if len(TEXT_ITEM) == 1 then}
+          ?? CHR({asc(TEXT_ITEM)}) AT {nul2zero(COL_POSITN)}
+        { else}
+          ?? REPLICATE(CHR({asc(TEXT_ITEM)}), {len(TEXT_ITEM)}) AT {nul2zero(COL_POSITN)}
+        { endif
+      else
+        if nul2zero(COL_POSITN) == 0 and len(TEXT_ITEM) >=3 and
+           upper(substr(TEXT_ITEM, 1, 3)) == ".PB" then
+           // User specified page break}
+  EJECT PAGE
 { if len(TEXT_ITEM) > 3 then}
 ?? "{substr(TEXT_ITEM, 4)}" AT 3
 { endif
@@ -733,6 +718,7 @@ return;
 enddef
 }
 // EOP SCR2FRG.COD
+```
 
 
 

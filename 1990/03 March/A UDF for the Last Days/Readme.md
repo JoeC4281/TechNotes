@@ -23,7 +23,7 @@ RETURN(ldm)
 ```
 Suppose you are preparing a report in which you need to give the full reporting period using the exact days. Let's also assume that you are running your report in the starting month and that the ending period is the last day of the following month. Also assume that the starting date is the computer system date (returned by the DATE() function).
 
-Using the UDF above, your expression would look somethhing like this:
+Using the UDF above, your expression would look something like this:
 
 ```dos
 LDM(MONTH(DATE()))

@@ -1,30 +1,31 @@
-# TechNotes
-January 1988<br>
-Page 31
+# Usage Tips - APPEND FROM ... SDF/DELIMITED and Dates
 
-When the PICTURE clause of an @...GET...PICTURE command contains conflicting variable length, template, or function arguments, the template may override the function or the value may override the template.
-
-Table 1 includes some possibilities.
-
+Text files in the SDF or DELIMITED formats can be brought into a dBASE III PLUS database file using the commands
+```dos
+APPEND FROM <filename> TYPE SDF
 ```
-mem  = 'AAAA'
-mem1 = 100
-mem2 = 0
-SET DELIMITERS ON
-
-     Picture
-mvar clause        Display   Comment
-mem  'xx'          :AA:      Template overrides length.
-mem  'xxxxxxxx'    :AAAA:    Length overrides template.
-mem  '@S2 xxxx'    :AA:      Scrolls.
-mem  '@S3 xxxx'    :AAA:     Scrolls.
-mem  '@S5 xxxxxxx' :AAAA:    Length overrides arguments.
-mem  '@S5 x'       :A:       No scroll, template overrides all.
-mem1 '@B *******'  :100*    :Function puts value over template
-                               and template incorrectly puts
-                               spaces where the value would
-                               have been placed if there were
-                               no function.
-mem2 '@Z *******'  :*******:   Template overrides function.
+or
+```dos
+APPEND FROM <filename> TYPE DELIMITED
 ```
+If the source file includes dates, you may need to bring the date into a character or numeric field and then perform a conversion process to create a valid dBASE date.
 
+In dBASE III and dBASE III PLUS database files, dates are stored as a string of eight digits:
+```dos
+YYYYMMDD
+```
+For example, January 15, 1988 would be stored as 19880115. If the dates in your text file are in this format, you can bring them directly into a date field. All eight digits must be present for this to work correctly.
+
+If your date is in any other format, you will need to perform at least one conversion step to remformat the date.
+
+If the date in the source text file is stored as "MM/DD/YY" or "MM/DD/YYYY", establish a character field with a field length of eight or ten characters, depending on whether the dates have a two- or four-digit year. After you have APPENDed the text file, MODIFY STRUCTURE and change the character field to a date field.
+
+dBASE III PLUS will correctly convert the character date to a date field. For dates stored in other formats, follow these general steps:
+
+1. APPEND into a temporary numeric or character field, as appropriate.
+
+2. Add a new date field with MODIFY STRUCTURE.
+
+3. Use the REPLACE command in combination with a dBASE expression that will convert the numeric or character field to a date.
+
+4. Remove the temporary field with MODIFY STRUCTURE.
